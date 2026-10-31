@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SmartCare - Billing & Reports</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#f0fdfa] min-h-screen text-slate-800">
+    <nav class="bg-[#00796b] text-white p-4 shadow-md flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-bold">SmartCare</h1>
+            <p class="text-xs text-teal-100">आरोग्यं परमं भाग्यम्</p>
+        </div>
+        <div class="space-x-4">
+            <a href="/" class="hover:underline">Dashboard</a>
+            <a href="/patients" class="hover:underline">Patients</a>
+            <a href="/billing" class="underline font-semibold">Billing</a>
+        </div>
+    </nav>
+    <div class="max-w-6xl mx-auto p-6 mt-6 bg-white rounded-xl shadow-md">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-[#004d40]">Billing & Invoices</h2>
+            <button onclick="window.print()" class="bg-[#00796b] text-white px-4 py-2 rounded-lg shadow hover:bg-[#005b4f] transition">
+                Download / Print Invoice (PDF)
+            </button>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-teal-50 text-[#00796b] border-b">
+                        <th class="p-3">Bill ID</th>
+                        <th class="p-3">Patient ID</th>
+                        <th class="p-3">Patient Name</th>
+                        <th class="p-3">Date</th>
+                        <th class="p-3">Amount (₹)</th>
+                        <th class="p-3">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="billing-table-body">
+                    <!-- Data will be dynamically loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        fetch('/api/billing')
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('billing-table-body');
+                tbody.innerHTML = '';
+                data.forEach(item => {
+                    tbody.innerHTML += `
+                        <tr class="border-b hover:bg-slate-50">
+                            <td class="p-3 font-semibold text-[#00796b]">${item.billId}</td>
+                            <td class="p-3">${item.patientId}</td>
+                            <td class="p-3">${item.patientName}</td>
+                            <td class="p-3">${item.date}</td>
+                            <td class="p-3">₹${item.paidAmount}</td>
+                            <td class="p-3"><span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-bold">${item.status}</span></td>
+                        </tr>
+                    `;
+                });
+            });
+    </script>
+</body>
+</html>

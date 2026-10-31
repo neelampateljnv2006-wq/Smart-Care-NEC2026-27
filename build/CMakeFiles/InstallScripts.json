@@ -1,0 +1,9 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/Users/Neelam/OneDrive/Desktop/NEC_III/build/cmake_install.cmake",
+		"C:/Users/Neelam/OneDrive/Desktop/NEC_III/build/_deps/nlohmann_json-build/cmake_install.cmake",
+		"C:/Users/Neelam/OneDrive/Desktop/NEC_III/build/_deps/crow-build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
