@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SmartCare - Patient Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#f0fdfa] min-h-screen text-slate-800">
+    <nav class="bg-[#00796b] text-white p-4 shadow-md flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-bold">SmartCare</h1>
+            <p class="text-xs text-teal-100">आरोग्यं परमं भाग्यम्</p>
+        </div>
+        <div class="space-x-4">
+            <a href="/" class="hover:underline">Dashboard</a>
+            <a href="/patients" class="underline font-semibold">Patients</a>
+            <a href="/billing" class="hover:underline">Billing</a>
+        </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto p-6 mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Add Patient Form -->
+        <div class="bg-white p-6 rounded-xl shadow-md md:col-span-1">
+            <h2 class="text-xl font-bold text-[#004d40] mb-4">Register New Patient</h2>
+            <form id="patient-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600">Patient ID</label>
+                    <input type="text" id="patientId" required class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" placeholder="e.g. P-101">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600">Full Name</label>
+                    <input type="text" id="name" required class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" placeholder="e.g. Ramesh Kumar">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600">Age</label>
+                    <input type="number" id="age" required class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" placeholder="e.g. 45">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600">Gender</label>
+                    <select id="gender" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600">Contact Number</label>
+                    <input type="text" id="contact" required class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" placeholder="e.g. 9876543210">
+                </div>
+                <button type="submit" class="w-full bg-[#00796b] text-white py-2 rounded-lg font-semibold shadow hover:bg-[#005b4f] transition">
+                    Save Patient
+                </button>
+            </form>
+        </div>
+
+        <!-- Patients List Table -->
+        <div class="bg-white p-6 rounded-xl shadow-md md:col-span-2">
+            <h2 class="text-xl font-bold text-[#004d40] mb-4">Admitted Patients Directory</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-teal-50 text-[#00796b] border-b">
+                            <th class="p-3">ID</th>
+                            <th class="p-3">Name</th>
+                            <th class="p-3">Age</th>
+                            <th class="p-3">Gender</th>
+                            <th class="p-3">Contact</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patients-table-body">
+                        <!-- Dynamic data will load here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fetch and display patients
+        function loadPatients() {
+            fetch('/api/patients')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('patients-table-body');
+                    tbody.innerHTML = '';
+                    data.forEach(p => {
+                        tbody.innerHTML += `
+                            <tr class="border-b hover:bg-slate-50">
+                                <td class="p-3 font-semibold text-[#00796b]">${p.id}</td>
+                                <td class="p-3">${p.name}</td>
+                                <td class="p-3">${p.age}</td>
+                                <td class="p-3">${p.gender}</td>
+                                <td class="p-3">${p.contact}</td>
+                            </tr>
+                        `;
+                    });
+                });
+        }
+
+        // Handle form submission
+        document.getElementById('patient-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const payload = {
+                id: document.getElementById('patientId').value,
+                name: document.getElementById('name').value,
+                age: parseInt(document.getElementById('age').value),
+                gender: document.getElementById('gender').value,
+                contact: document.getElementById('contact').value
+            };
+
+            fetch('/api/patients', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(res => {
+                if(res.ok) {
+                    alert('Patient registered successfully!');
+                    document.getElementById('patient-form').reset();
+                    loadPatients();
+                } else {
+                    alert('Failed to register patient.');
+                }
+            });
+        });
+
+        loadPatients();
+    </script>
+</body>
+</html>
