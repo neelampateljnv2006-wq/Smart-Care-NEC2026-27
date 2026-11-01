@@ -154,3 +154,88 @@ int main() {
     std::cout << "SmartCare C++17 Backend running on port " << port << "\n";
     app.port(port).multithreaded().run();
 }
+// --- DOCTORS MANAGEMENT (Admin / Receptionist can add/update) ---
+CROW_ROUTE(app, "/api/doctors").methods("POST"_method)([&storage](const crow::request& req) {
+    auto body = json::parse(req.body, nullptr, false);
+    if (body.is_discarded()) return cors(crow::response(400, "{\"error\":\"Invalid JSON\"}"));
+    
+    json list = storage.readData("doctors.json");
+    body["id"] = "DOC-" + std::to_string(50 + list.size() + 1);
+    list.push_back(body);
+    storage.writeData("doctors.json", list);
+    return cors(crow::response(201, body.dump()));
+});
+
+// --- BEDS ALLOCATION & UPDATE (Receptionist / Admin) ---
+CROW_ROUTE(app, "/api/beds/<string>").methods("PUT"_method)([&storage](const crow::request& req, std::string bedId) {
+    auto body = json::parse(req.body, nullptr, false);
+    json list = storage.readData("beds.json");
+    bool found = false;
+
+    for (auto& b : list) {
+        if (b.value("bedId", "") == bedId) {
+            if (body.contains("status")) b["status"] = body["status"];
+            if (body.contains("patientId")) b["patientId"] = body["patientId"];
+            found = true;
+            break;
+        }
+    }
+    if (found) {
+        storage.writeData("beds.json", list);
+        return cors(crow::response(200, "{\"message\":\"Bed status updated successfully\"}"));
+    }
+    return cors(crow::response(404, "{\"error\":\"Bed not found\"}"));
+});
+// --- DOCTORS: ADD DOCTOR (Admin only) ---
+    CROW_ROUTE(app, "/api/doctors").methods("POST"_method)([&storage](const crow::request& req) {
+        auto body = json::parse(req.body, nullptr, false);
+        if (body.is_discarded()) return cors(crow::response(400, "{\"error\":\"Invalid JSON\"}"));
+        
+        json list = storage.readData("doctors.json");
+        body["id"] = "DOC-" + std::to_string(50 + list.size() + 1);
+        list.push_back(body);
+        storage.writeData("doctors.json", list);
+        return cors(crow::response(201, body.dump()));
+    });
+
+    // --- DOCTORS: UPDATE AVAILABILITY (Doctor / Admin) ---
+    CROW_ROUTE(app, "/api/doctors/<string>").methods("PUT"_method)([&storage](const crow::request& req, std::string docId) {
+        auto body = json::parse(req.body, nullptr, false);
+        json list = storage.readData("doctors.json");
+        bool found = false;
+
+        for (auto& d : list) {
+            if (d.value("id", "") == docId) {
+                if (body.contains("availability")) d["availability"] = body["availability"];
+                if (body.contains("status")) d["status"] = body["status"];
+                found = true;
+                break;
+            }
+        }
+        if (found) {
+            storage.writeData("doctors.json", list);
+            return cors(crow::response(200, "{\"message\":\"Doctor availability updated successfully\"}"));
+        }
+        return cors(crow::response(404, "{\"error\":\"Doctor not found\"}"));
+    });
+
+    // --- BEDS: UPDATE BED STATUS / ASSIGN PATIENT (Receptionist / Admin) ---
+    CROW_ROUTE(app, "/api/beds/<string>").methods("PUT"_method)([&storage](const crow::request& req, std::string bedId) {
+        auto body = json::parse(req.body, nullptr, false);
+        json list = storage.readData("beds.json");
+        bool found = false;
+
+        for (auto& b : list) {
+            if (b.value("bedId", "") == bedId) {
+                if (body.contains("status")) b["status"] = body["status"];
+                if (body.contains("patientId")) b["patientId"] = body["patientId"];
+                found = true;
+                break;
+            }
+        }
+        if (found) {
+            storage.writeData("beds.json", list);
+            return cors(crow::response(200, "{\"message\":\"Bed allocation updated successfully\"}"));
+        }
+        return cors(crow::response(404, "{\"error\":\"Bed not found\"}"));
+    });
