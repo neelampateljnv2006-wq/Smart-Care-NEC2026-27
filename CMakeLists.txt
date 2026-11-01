@@ -35,16 +35,20 @@ FetchContent_MakeAvailable(Crow)
 
 add_executable(smartcare_backend backend/main.cpp)
 
-target_include_directories(smartcare_backend PRIVATE ${ASIO_INCLUDE_DIR})
-
-# --- PEHLE SQLITE3 PACKAGE FIND KAREIN ---
+# Find SQLite3 package
 find_package(SQLite3 REQUIRED)
 
-# --- FIR LIBRARIES LINK KAREIN ---
+# Include directories for Asio and SQLite3
+target_include_directories(smartcare_backend PRIVATE 
+    ${ASIO_INCLUDE_DIR}
+    ${SQLITE3_INCLUDE_DIRS}
+)
+
+# Link libraries using standard variables
 target_link_libraries(smartcare_backend PRIVATE 
     Crow::Crow 
     nlohmann_json::nlohmann_json
-    SQLite3::SQLite3
+    ${SQLITE3_LIBRARIES}
 )
 
 # Link Windows socket libraries only when building on Windows local PC
