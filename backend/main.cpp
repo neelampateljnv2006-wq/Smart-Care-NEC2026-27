@@ -98,8 +98,13 @@ int main() {
         return cors(crow::response(201, body.dump()));
     });
 
-    std::cout << "SmartCare C++17 Backend running on http://localhost:8080\n";
-    app.port(8080).multithreaded().run();
-    return 0;
+    int port = 8080;
+    const char* env_port = std::getenv("PORT");
+    if (env_port != nullptr) {
+        port = std::stoi(env_port);
+    }
+
+    std::cout << "SmartCare C++17 Backend running on port " << port << "\n";
+    app.port(port).multithreaded().run();
 }
 
