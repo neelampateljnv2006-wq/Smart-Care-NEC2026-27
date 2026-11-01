@@ -37,13 +37,16 @@ add_executable(smartcare_backend backend/main.cpp)
 
 target_include_directories(smartcare_backend PRIVATE ${ASIO_INCLUDE_DIR})
 
+# Find SQLite3 (Capitalized package name works on Linux/Ubuntu and Windows)
+find_package(SQLite3 REQUIRED)
+
 target_link_libraries(smartcare_backend PRIVATE 
     Crow::Crow 
     nlohmann_json::nlohmann_json
-    ws2_32
-    mswsock
+    SQLite3::SQLite3
 )
 
-# Link SQLite3
-find_package(sqlite3 REQUIRED)
-
+# Link Windows socket libraries only when building on Windows local PC
+if(WIN32)
+    target_link_libraries(smartcare_backend PRIVATE ws2_32 mswsock)
+endif()
