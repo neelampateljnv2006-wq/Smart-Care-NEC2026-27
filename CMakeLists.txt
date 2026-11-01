@@ -37,9 +37,10 @@ add_executable(smartcare_backend backend/main.cpp)
 
 target_include_directories(smartcare_backend PRIVATE ${ASIO_INCLUDE_DIR})
 
-# Find SQLite3 (Capitalized package name works on Linux/Ubuntu and Windows)
+# --- PEHLE SQLITE3 PACKAGE FIND KAREIN ---
 find_package(SQLite3 REQUIRED)
 
+# --- FIR LIBRARIES LINK KAREIN ---
 target_link_libraries(smartcare_backend PRIVATE 
     Crow::Crow 
     nlohmann_json::nlohmann_json
